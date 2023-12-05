@@ -7,9 +7,9 @@
       How to Play: Remember the sequence, avoid interference, and choose the
       correct strips.
     </p>
-    <footer>
+    <!-- <footer>
       <p>Created by [Your Name]</p>
-    </footer>
+    </footer> -->
   </div>
 </template>
 
@@ -24,5 +24,5 @@ export default {
 </script>
 
 <style>
-@import "../styles/choice.css";
+@import "../styles/homepage.css";
 </style>

@@ -1,13 +1,51 @@
+/* Title Style */
 h1 {
-  text-align: center; /* 居中标题 */
-  font-family: "Comic Sans MS", cursive, sans-serif; /* 使用更加轻松活泼的字体 */
-  font-size: 32px; /* 调整字体大小 */
-  color: #67c23a; /* 可以选择一个适合的颜色 */
-  margin-top: 10px; /* 在标题上方留出一些空间 */
-  margin-bottom: 20px; /* 在标题下方留出一些空间 */
+  text-align: center;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-size: 32px;
+  color: #67c23a;
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 
-/* Game container */
+/* Progress Container Style */
+.progress-container {
+  width: 100%;
+  position: fixed;
+  top: 1%;
+  left: 1%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 两端对齐，元素间隔最大 */
+}
+
+/* Back Button Style */
+.back-button {
+  font-size: 14px;
+  color: #fff;
+  background-color: #67c23a;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  margin-left: 25px;
+}
+
+/* Countdown Clock Style */
+.countdown-clock {
+  transform: scale(0.6);
+}
+
+.countdown-clock span {
+  font-size: 45px;
+  color: rgb(19, 206, 102);
+  font-family: "Arial", sans-serif;
+  text-align: center;
+  line-height: 50px;
+  font-weight: bold;
+}
+
+/* Game Container Style */
 .game-container {
   width: 100%;
   height: 400px;
@@ -19,7 +57,7 @@ h1 {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Image styles */
+/* Image Style */
 .strip-image {
   max-width: 90%;
   height: auto;
@@ -27,7 +65,7 @@ h1 {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Phase containers */
+/* Phase Container Style */
 .memory-phase,
 .interference-phase,
 .options {
@@ -37,14 +75,14 @@ h1 {
   align-items: center;
 }
 
-/* Options grid */
+/* Options Grid Style */
 .options {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
 }
 
-/* Option strips */
+/* Option Strip Style */
 .option-strip {
   flex-basis: 80%;
   margin: 20px;
@@ -54,87 +92,66 @@ h1 {
   align-items: center;
 }
 
-/* Option strip images */
+/* Option Strip Image Style */
 .option-strip img {
   width: 100%;
   border-radius: 5px;
 }
 
+/* Countdown Timer Bar Container Style */
 .countdown-timer-bar-container {
   width: 90%;
   height: 18px;
-  margin: 0 auto; /* 上下边距为 0，左右边距为 auto */
-  margin-bottom: 20px; /* 您可以保留这个设置，以在容器下方添加额外的空间 */
+  margin: 0 auto;
+  margin-bottom: 20px;
   position: relative;
   z-index: 2;
-  /* border-radius: 10px; */
 }
 
+/* Countdown Timer Parts Style */
 .red-part,
 .green-part,
 .blue-part {
   position: absolute;
   top: 0;
   height: 100%;
-  /* border-radius: 10px; */
 }
 
 .red-part {
   left: 0;
-  width: 20%; /* 红色部分宽度 */
+  width: 20%;
   background-color: #ffb6c18a;
   border-radius: 10px 0 0 10px;
 }
 
 .green-part {
-  left: 20%; /* 紧接红色部分 */
-  width: 20%; /* 绿色部分宽度 */
+  left: 20%;
+  width: 20%;
   background-color: #98ff987a;
 }
 
 .blue-part {
-  left: 40%; /* 紧接绿色部分 */
-  width: 60%; /* 蓝色部分宽度 */
+  left: 40%;
+  width: 60%;
   background-color: #87cefa;
   border-radius: 0 10px 10px 0;
 }
 
+/* Countdown Timer Bar Style */
 .countdown-timer-bar {
   height: 100%;
   position: absolute;
   background-color: rgb(223, 210, 95);
-  transition: width 1s linear;
-  z-index: 10; /* 确保这个值高于 ::after 和 ::before 伪元素 */
+  transition: width 0.1s linear;
+  z-index: 10;
   border-radius: 10px;
 }
 
+/* Answer Feedback Style */
 .correct-answer .strip-image {
-  box-shadow: 0 0 20px 2px #087108; /* 绿色发光效果 */
+  box-shadow: 0 0 20px 2px #087108;
 }
 
 .wrong-answer .strip-image {
-  box-shadow: 0 0 20px 2px #ff0000; /* 红色发光效果 */
-}
-
-.progress-container {
-  position: fixed; /* 固定定位，相对于视口 */
-  top: 1%; /* 距离顶部的距离 */
-  right: 1%; /* 距离右侧的距离 */
-}
-
-.countdown-clock {
-  transform: scale(0.6); /* 缩小到原始尺寸的 50% */
-}
-
-.countdown-clock span {
-  font-size: 45px; /* 增大字体大小以提高可读性 */
-  color: rgb(
-    19,
-    206,
-    102
-  ); /* Element UI 'success' 状态的颜色，或者您可以选择一个适合的绿色 */
-  font-family: "Arial", sans-serif; /* 使用 Arial 字体 */
-  text-align: center; /* 确保文本居中 */
-  line-height: 50px; /* 调整行高以垂直居中文本 */
-  font-weight: bold; /* 加粗文本 */
+  box-shadow: 0 0 20px 2px #ff0000;
 }

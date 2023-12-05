@@ -1,0 +1,34 @@
+.homepage {
+  text-align: center;
+  padding: 50px;
+  background-color: #f5f5dc;
+}
+
+.homepage h1 {
+  font-size: 2em;
+  color: #67c23a;
+}
+
+.homepage p {
+  font-size: 1.2em;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1em;
+  background-color: #67c23a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+button:hover {
+  background-color: #569a32;
+}
+
+footer {
+  margin-top: 50px;
+  font-size: 0.8em;
+}
