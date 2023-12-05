@@ -227,3 +227,7 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+@import "../styles/choice.css";
+</style>
