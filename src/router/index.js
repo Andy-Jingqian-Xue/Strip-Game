@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import ChoiceQuestion from "../components/ChoiceQuestion.vue";
 import HomePage from "../components/HomePage.vue";
+import EndPage from "../components/EndPage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,6 +15,12 @@ const router = createRouter({
       path: "/choice-question",
       name: "choiceQuestion",
       component: ChoiceQuestion,
+    },
+    {
+      path: "/cq-endpage",
+      name: "EndPage",
+      component: EndPage,
+      props: true,
     },
   ],
 });

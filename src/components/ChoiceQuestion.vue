@@ -1,6 +1,9 @@
 <template>
   <h1>Strip Game</h1>
+
+  <!-- Progress Container with Back Button and Timer -->
   <div class="progress-container">
+    <el-button class="back-button" @click="goToHomePage">Back</el-button>
     <el-progress
       type="circle"
       class="countdown-clock"
@@ -8,9 +11,11 @@
       :stroke-width="12"
       status="success"
     >
-      <span slot="format">{{ gameTimeLeft }}</span></el-progress
-    >
+      <span>{{ gameTimeLeft }}</span>
+    </el-progress>
   </div>
+
+  <!-- Game Play Area -->
   <div>
     <div class="countdown-timer-bar-container">
       <div class="red-part"></div>
@@ -21,6 +26,7 @@
         :style="{ width: countdownWidth + '%' }"
       ></div>
     </div>
+
     <div class="game-container">
       <!-- Memory Phase -->
       <section v-if="gamePhase === 1" class="memory-phase">
@@ -72,6 +78,7 @@
 export default {
   data() {
     return {
+      // Game data
       strips: [],
       imgPwd: "src/assets/img",
       gamePhase: 1,
@@ -80,31 +87,31 @@ export default {
       countdown: 10,
       countdownWidth: 100,
       countdownInterval: null,
-      selectedAnswerStatus: null, // 'correct', 'wrong', 或 null
-      selectedStrip: null, // 用户选择的条带
-      gameDuration: 30, // 游戏总时长（秒）
-      gameTimeLeft: 30, // 游戏剩余时间
-      gameTimer: null, // 游戏倒计时定时器
-      gameProgress: 100, // 游戏进度（百分比）
-      correctAnswersCount: 0, // 答对的题目数
-      //模拟提交1
-      // 模拟测试2
+      selectedAnswerStatus: null,
+      selectedStrip: null,
+      gameDuration: 30,
+      gameTimeLeft: 30,
+      gameTimer: null,
+      gameProgress: 100,
+      correctAnswersCount: 0,
     };
   },
   methods: {
-    // 创建条带数组
+    // Create an array of strips
     createStrips() {
       return Array.from({ length: 35 }, (_, i) => ({
         name: String(i + 1),
         image: `${i + 1}.svg`,
       }));
     },
-    // 随机选择一个条带
+
+    // Randomly select a strip
     selectRandomStrip() {
       this.memoryStrip =
         this.strips[Math.floor(Math.random() * this.strips.length)];
     },
-    // 生成选项并打乱
+
+    // Generate and shuffle options
     generateOptions() {
       let optionsSet = new Set([this.memoryStrip]);
       while (optionsSet.size < 4) {
@@ -115,41 +122,46 @@ export default {
       this.optionStrips = Array.from(optionsSet);
       this.shuffleArray(this.optionStrips);
     },
-    // 打乱数组的顺序
+
+    // Shuffle array utility
     shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
       }
     },
-    // 开始游戏
+
+    // Start the game
     startGame() {
       this.strips = this.createStrips();
       this.selectRandomStrip();
       this.gamePhase = 1;
       this.startCountdown();
     },
-    // 检查答案
+
+    // Check the answer and update the score
     checkAnswer(selectedStrip) {
       if (this.gamePhase === 3 && !this.isAnswering) {
-        this.isAnswering = true; // 标记为正在作答
+        this.isAnswering = true;
         this.selectedStrip = selectedStrip;
         this.selectedAnswerStatus =
           selectedStrip.name === this.memoryStrip.name ? "correct" : "wrong";
-        // 如果答案正确，增加答对次数
         if (selectedStrip.name === this.memoryStrip.name) {
-          this.correctAnswersCount++;
+          this.$store.commit("incrementScore");
+        } else {
+          this.$store.commit("decrementScore");
         }
-        clearInterval(this.countdownInterval); // 停止倒计时
+        clearInterval(this.countdownInterval);
 
         setTimeout(() => {
-          this.resetGame(); // 在一定时间后重置游戏
+          this.resetGame();
         }, 1000);
       }
     },
 
-    // 开始倒计时
+    // Start the countdown
     startCountdown() {
+      this.updateCountdown();
       this.countdown = 10;
       this.countdownWidth = 0;
 
@@ -158,30 +170,34 @@ export default {
       }
 
       this.countdownInterval = setInterval(() => {
-        this.countdown--;
-        this.countdownWidth = ((10 - this.countdown) / 10) * 100;
-
-        if (this.countdown === 7 && this.gamePhase === 1) {
-          this.gamePhase = 2;
-        } else if (this.countdown === 5 && this.gamePhase === 2) {
-          this.gamePhase = 3;
-          this.generateOptions();
-        }
-
-        if (this.countdown === -1) {
-          clearInterval(this.countdownInterval);
-          this.resetGame();
-        }
-      }, 1000);
+        this.updateCountdown();
+      }, 100);
     },
-    // 在组件销毁前清除计时器
-    beforeDestroy() {
-      if (this.gameTimer) {
-        clearInterval(this.gameTimer);
+
+    updateCountdown() {
+      this.countdown = this.countdown - 0.1;
+
+      if (this.countdown < 0) {
+        clearInterval(this.countdownInterval);
+        this.resetGame();
+        return;
       }
-      clearInterval(this.countdownInterval);
+
+      this.countdownWidth = ((10 - this.countdown) / 10) * 100;
+
+      if (this.countdown <= 8 && this.countdown > 7.9 && this.gamePhase === 1) {
+        this.gamePhase = 2;
+      } else if (
+        this.countdown <= 6 &&
+        this.countdown > 5.9 &&
+        this.gamePhase === 2
+      ) {
+        this.gamePhase = 3;
+        this.generateOptions();
+      }
     },
-    // 重置游戏状态
+
+    // Reset the game state
     resetGame() {
       this.gamePhase = 1;
       this.countdown = 10;
@@ -192,6 +208,8 @@ export default {
 
       this.startGame();
     },
+
+    // Start the game clock
     startGameClock() {
       if (this.gameTimer) {
         clearInterval(this.gameTimer);
@@ -204,26 +222,31 @@ export default {
           this.gameProgress = (this.gameTimeLeft / this.gameDuration) * 100;
         } else {
           clearInterval(this.gameTimer);
-          this.endGame(); // 游戏时间结束
+          this.endGame();
         }
       }, 1000);
     },
 
+    // Navigate to Home Page
+    goToHomePage() {
+      this.$router.push("/");
+    },
+
+    // End the game and show results
     endGame() {
-      // 游戏结束逻辑
-      // 例如：显示游戏结束消息、重置游戏状态等
-      // 清除所有定时器
       clearInterval(this.gameTimer);
       clearInterval(this.countdownInterval);
 
-      alert(`游戏结束。你共答对了 ${this.correctAnswersCount} 题目。`);
-      //   this.resetGame(); // 可以在这里调用重置游戏的逻辑
+      // 跳转到游戏结束页面，并传递分数
+      this.$router.push({
+        name: "EndPage",
+      });
     },
   },
-  // 组件挂载时开始游戏
   mounted() {
     this.startGame();
-    this.startGameClock(); // 启动游戏时钟
+    this.startGameClock();
+    this.$store.commit("resetScore");
   },
 };
 </script>
