@@ -1,6 +1,6 @@
-# strip-game
+# Strip Game
 
-This template should help get you started developing with Vue 3 in Vite.
+This is a memory game inspired by Christopher Alexander's 35-strip experiments. In this game, you are required to remember the 2 strips in 2 seconds, and try to find the right answers in 8 options. Let's get started!
 
 ## Recommended IDE Setup
 
