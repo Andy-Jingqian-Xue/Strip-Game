@@ -11,6 +11,10 @@ export default createStore({
     setScore(state, score) {
       state.score = score;
     },
+    increment2Score(state, increment = 2) {
+      state.score += increment;
+    },
+
     incrementScore(state, increment = 1) {
       state.score += increment;
     },

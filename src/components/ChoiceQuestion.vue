@@ -31,15 +31,21 @@
       <!-- Memory Phase -->
       <section v-if="gamePhase === 1" class="memory-phase">
         <img
-          v-if="memoryStrip"
-          :src="`${imgPwd}/${memoryStrip.image}`"
-          :alt="memoryStrip.name"
+          v-for="strip in memoryStrips"
+          :key="strip.name"
+          :src="`${imgPwd}/${strip.image}`"
+          :alt="strip.name"
           class="strip-image"
         />
       </section>
 
       <!-- Interference Phase -->
       <section v-if="gamePhase === 2" class="interference-phase">
+        <img
+          :src="`${imgPwd}/${interferenceImage}`"
+          alt="Interference Image"
+          class="strip-image"
+        />
         <img
           :src="`${imgPwd}/${interferenceImage}`"
           alt="Interference Image"
@@ -53,14 +59,11 @@
           v-for="strip in optionStrips"
           :key="strip.name"
           class="option-strip"
-          @click="checkAnswer(strip)"
+          @click="selectedStrips.length < 2 && checkAnswer(strip)"
           :class="{
-            'correct-answer':
-              selectedAnswerStatus === 'correct' &&
-              strip.name === selectedStrip.name,
-            'wrong-answer':
-              selectedAnswerStatus === 'wrong' &&
-              strip.name === selectedStrip.name,
+            disabled: selectedStrips.length >= 2,
+            'correct-answer': isSelectedAndCorrect(strip.name),
+            'wrong-answer': isSelectedAndWrong(strip.name),
           }"
         >
           <img
@@ -79,7 +82,9 @@ export default {
   data() {
     return {
       // Game data
-      strips: [],
+      memoryStrips: [],
+      optionStrips: [],
+      selectedStrips: [],
       imgPwd: "src/assets/img",
       gamePhase: 1,
       memoryStrip: null,
@@ -88,7 +93,6 @@ export default {
       countdownWidth: 100,
       countdownInterval: null,
       selectedAnswerStatus: null,
-      selectedStrip: null,
       gameDuration: 30,
       gameTimeLeft: 30,
       gameTimer: null,
@@ -96,6 +100,19 @@ export default {
       correctAnswersCount: 0,
     };
   },
+
+  beforeDestroy() {
+    // 清除游戏计时器
+    if (this.gameTimer) {
+      clearInterval(this.gameTimer);
+    }
+
+    // 清除每轮游戏的计时器
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+    }
+  },
+
   methods: {
     // Create an array of strips
     createStrips() {
@@ -106,15 +123,20 @@ export default {
     },
 
     // Randomly select a strip
-    selectRandomStrip() {
-      this.memoryStrip =
-        this.strips[Math.floor(Math.random() * this.strips.length)];
+    selectRandomStrips() {
+      // 随机选择两个不同的条带
+      while (this.memoryStrips.length < 2) {
+        let strip = this.strips[Math.floor(Math.random() * this.strips.length)];
+        if (!this.memoryStrips.includes(strip)) {
+          this.memoryStrips.push(strip);
+        }
+      }
     },
 
-    // Generate and shuffle options
     generateOptions() {
-      let optionsSet = new Set([this.memoryStrip]);
-      while (optionsSet.size < 4) {
+      // 生成八个选项
+      let optionsSet = new Set(this.memoryStrips);
+      while (optionsSet.size < 8) {
         optionsSet.add(
           this.strips[Math.floor(Math.random() * this.strips.length)]
         );
@@ -131,32 +153,61 @@ export default {
       }
     },
 
-    // Start the game
     startGame() {
       this.strips = this.createStrips();
-      this.selectRandomStrip();
+      this.selectRandomStrips(); // 修改这里
       this.gamePhase = 1;
       this.startCountdown();
     },
 
-    // Check the answer and update the score
     checkAnswer(selectedStrip) {
-      if (this.gamePhase === 3 && !this.isAnswering) {
-        this.isAnswering = true;
-        this.selectedStrip = selectedStrip;
-        this.selectedAnswerStatus =
-          selectedStrip.name === this.memoryStrip.name ? "correct" : "wrong";
-        if (selectedStrip.name === this.memoryStrip.name) {
-          this.$store.commit("incrementScore");
-        } else {
-          this.$store.commit("decrementScore");
-        }
-        clearInterval(this.countdownInterval);
+      if (this.gamePhase !== 3 || this.selectedStrips.length >= 2) {
+        // 如果已经选择了两个条带，直接返回
+        return;
+      }
 
+      const isCorrect = this.memoryStrips.some(
+        (memoryStrip) => memoryStrip.name === selectedStrip.name
+      );
+
+      // 如果已经选中，则不再添加
+      if (
+        !this.selectedStrips.find((strip) => strip.name === selectedStrip.name)
+      ) {
+        this.selectedStrips.push({
+          ...selectedStrip,
+          status: isCorrect ? "correct" : "wrong",
+        });
+      }
+
+      // 更新分数
+      if (isCorrect) {
+        this.$store.commit("incrementScore");
+      } else {
+        this.$store.commit("decrementScore");
+      }
+
+      // 如果玩家已经选择了两个条带，结束这一轮游戏
+      if (this.selectedStrips.length >= 2) {
+        clearInterval(this.countdownInterval);
         setTimeout(() => {
           this.resetGame();
         }, 1000);
       }
+    },
+
+    isSelectedAndCorrect(name) {
+      const stripInfo = this.selectedStrips.find(
+        (strip) => strip.name === name
+      );
+      return stripInfo && stripInfo.status === "correct";
+    },
+
+    isSelectedAndWrong(name) {
+      const stripInfo = this.selectedStrips.find(
+        (strip) => strip.name === name
+      );
+      return stripInfo && stripInfo.status === "wrong";
     },
 
     // Start the countdown
@@ -197,16 +248,29 @@ export default {
       }
     },
 
-    // Reset the game state
     resetGame() {
-      this.gamePhase = 1;
-      this.countdown = 10;
-      this.countdownWidth = 0;
-      this.selectedAnswerStatus = null;
-      this.selectedStrip = null;
-      this.isAnswering = false;
+      // 清空选中的条带和状态
+      this.selectedStrips = [];
+      this.memoryStrips = [];
+      this.selectRandomStrips();
 
-      this.startGame();
+      // 重置游戏阶段
+      this.gamePhase = 1;
+
+      // 重置倒计时和宽度
+      this.countdown = 10;
+      this.countdownWidth = 100;
+
+      // 停止任何正在进行的倒计时
+      clearInterval(this.countdownInterval);
+
+      // 重新启动倒计时
+      this.startCountdown();
+    },
+
+    resetSelectedStrips() {
+      // 重置玩家的选择
+      this.selectedStrips = [];
     },
 
     // Start the game clock
@@ -230,6 +294,14 @@ export default {
     // Navigate to Home Page
     goToHomePage() {
       this.$router.push("/");
+
+      // 在离开页面时，也清除所有计时器
+      if (this.gameTimer) {
+        clearInterval(this.gameTimer);
+      }
+      if (this.countdownInterval) {
+        clearInterval(this.countdownInterval);
+      }
     },
 
     // End the game and show results
@@ -243,6 +315,7 @@ export default {
       });
     },
   },
+
   mounted() {
     this.startGame();
     this.startGameClock();
