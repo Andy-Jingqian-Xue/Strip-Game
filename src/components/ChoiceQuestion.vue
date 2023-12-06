@@ -134,13 +134,21 @@ export default {
     },
 
     generateOptions() {
-      // 生成八个选项
+      // 初始化选项集合，并添加两个记忆条带
       let optionsSet = new Set(this.memoryStrips);
+
+      // 当选项数量小于8时，继续添加条带
       while (optionsSet.size < 8) {
-        optionsSet.add(
-          this.strips[Math.floor(Math.random() * this.strips.length)]
-        );
+        let randomStrip =
+          this.strips[Math.floor(Math.random() * this.strips.length)];
+
+        // 只有当选项集合中还没有该条带时，才添加进去
+        if (!optionsSet.has(randomStrip)) {
+          optionsSet.add(randomStrip);
+        }
       }
+
+      // 将集合转换为数组，并随机打乱顺序
       this.optionStrips = Array.from(optionsSet);
       this.shuffleArray(this.optionStrips);
     },
