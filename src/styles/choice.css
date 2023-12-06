@@ -16,7 +16,7 @@ h1 {
   left: 1%;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 两端对齐，元素间隔最大 */
+  justify-content: space-between;
 }
 
 /* Back Button Style */
@@ -75,17 +75,34 @@ h1 {
   align-items: center;
 }
 
-/* Options Grid Style */
+/* Memory Phase Style for Two Strips */
+.memory-phase {
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Added gap between option strips */
+}
+
+.interference-phase {
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Added gap between option strips */
+}
+
+/* Answer Phase Style for Two Columns, Four Rows */
 .options {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: space-around; /* This will help distribute space around items */
+  align-items: center;
+  gap: 10px; /* Maintain gap between option strips */
 }
 
 /* Option Strip Style */
 .option-strip {
-  flex-basis: 80%;
-  margin: 20px;
+  flex-basis: 45%; /* Slightly increased size */
+  margin: 5px; /* Reduced margin to accommodate larger size while keeping two columns */
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -94,8 +111,8 @@ h1 {
 
 /* Option Strip Image Style */
 .option-strip img {
-  width: 100%;
-  border-radius: 5px;
+  width: 100%; /* Image will fill the flex container */
+  border-radius: 5px; /* Keep the rounded corners */
 }
 
 /* Countdown Timer Bar Container Style */
@@ -154,4 +171,8 @@ h1 {
 
 .wrong-answer .strip-image {
   box-shadow: 0 0 20px 2px #ff0000;
+}
+
+.disabled {
+  pointer-events: none; /* 禁用点击事件 */
 }
